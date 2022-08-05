@@ -7,6 +7,7 @@ Created on Fri Aug  5 08:31:38 2022
 
 from string import ascii_lowercase
 from tqdm import tqdm
+import time
 
 letter_order_lookup = {ascii_lowercase[i]: i for i in range(26)}
 
@@ -137,6 +138,7 @@ def create_initial_wordtree(filename='words_alpha.txt'):
 
 if __name__ == "__main__":
             
+    start_time = time.time()
     print("Creating word tree...")
     word_tree, anagram_lookup = create_initial_wordtree()
     print("There are", len(anagram_lookup), " words to work through")
@@ -145,3 +147,6 @@ if __name__ == "__main__":
         
     answer_list = []
     word_tree.solve(0,None,set(),[], answer_list, word_tree, False, 5)
+    end_time = time.time()
+    
+    print("Completed in",end_time-start_time," seconds")
