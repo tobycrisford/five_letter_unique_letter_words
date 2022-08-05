@@ -100,6 +100,7 @@ if __name__ == "__main__":
             
     print("Creating word tree...")
     word_tree, anagram_lookup = create_initial_wordtree()
+    print("There are", len(anagram_lookup), " words to work through")
     print("Word tree created")
 
         
