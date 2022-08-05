@@ -11,50 +11,12 @@ import time
 
 letter_order_lookup = {ascii_lowercase[i]: i for i in range(26)}
 
-#Tree for child keys, really efficient to read out in sorted order
-class WordChildLookup:
-    
-    def __init__(self):
-        
-        self.left_side = None
-        self.right_side = None
-        self.key = None
-        self.val = None
-    
-    def add(self,key):
-        if self.key is None:
-            self.key = key
-            return
-        if key <= self.key:
-            if self.left_side is None:
-                self.left_side = WordChildLookup()
-            self.left_side.add(key)
-            return
-        if self.right_side is None:
-            self.right_side = WordChildLookup()
-        self.right_side.add(key)
-        
-    def __iter__(self):
-        if not (self.left_side is None):
-            for key in self.left_side:
-                yield key
-        if not (self.key is None):
-            yield self.key
-        if not (self.right_side is None):
-            for key in self.right_side:
-                yield key
-        
-    
-    
-        
-
 class WordTree:
     
     def __init__(self, depth, layer=-1):
         
         self.layer = layer
         self.children = {}
-        self.children_keys = WordChildLookup()
         self.depth = depth
         self.all_words_contain = set(ascii_lowercase)
         
@@ -66,7 +28,6 @@ class WordTree:
             relevant_letter = word[self.layer+1]
             if not (relevant_letter in self.children):
                 self.children[relevant_letter] = WordTree(self.depth, layer=self.layer+1)
-                self.children_keys.add(relevant_letter)
             self.children[relevant_letter].add_word(word)
         self.all_words_contain = self.all_words_contain.intersection(set(word[self.layer+1:]))
                 
@@ -98,7 +59,7 @@ class WordTree:
             else:
                 start_place = -1
             
-            for child in self.children_keys:
+            for child in self.children:
                 if not (child in used_letters):
                     if letter_order_lookup[child] >= start_place:
                         if len(used_letters.intersection(self.children[child].all_words_contain)) == 0:
