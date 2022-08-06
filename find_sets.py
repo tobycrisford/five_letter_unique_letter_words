@@ -8,6 +8,7 @@ Created on Fri Aug  5 08:31:38 2022
 from string import ascii_lowercase
 from tqdm import tqdm
 import time
+import numpy as np
 
 letter_order_lookup = {ascii_lowercase[i]: i for i in range(26)}
 
@@ -71,13 +72,59 @@ class WordTree:
     	                                                top_parent,
     	                                                order_constraint and (letter_order_lookup[child] == start_place),
     	                                                iteration_depth)
-                        
+                            
+                            
+class WordTable:
+    
+    def __init__(self, word_length):
+        
+        self.letter_buckets = {l: set() for l in ascii_lowercase}
+        self.all_words = set()
+        self.word_length = word_length
+        
+    def add_word(self, word):
+        word_set = set(word)
+        for letter in self.letter_buckets:
+            if not (letter in word_set):
+                self.letter_buckets[letter].add(word)
+        self.all_words.add(word)
+                
+    def find_words_not_using(self, letters):
+        
+        letter_sizes = np.array([len(self.letter_buckets[l]) for l in letters])
+        size_order = np.argsort(letter_sizes)
+        output_words = self.letter_buckets[letters[size_order[0]]]
+        for i in size_order[1:]:
+            output_words = output_words.intersection(self.letter_buckets[letters[i]])
+            
+        return output_words
+        
+    
+    def solve(self, iteration_depth, iteration_number=0,letters_so_far=''):
+        
+        if letters_so_far == '':
+            active_word_list = tqdm(list(self.all_words))
+        else:
+            active_word_list = list(self.find_words_not_using(letters_so_far))
+        
+        if iteration_number == iteration_depth - 1:
+            return list(active_word_list)
+        
+        output = []
+        for word in active_word_list:
+            if word > letters_so_far[-self.word_length:]:
+                possibles = self.solve(iteration_depth,
+                                       iteration_number=iteration_number+1,
+                                       letters_so_far=letters_so_far+word)
+                output += [word + w for w in possibles]
+                
+        return output
+        
                         
 
-def create_initial_wordtree(filename='words_alpha.txt'):
+def create_initial_word_structure(structure, filename='words_alpha.txt', as_list=True):
 
     word_list = open('words_alpha.txt','r').readlines()
-    word_tree = WordTree(5)
 
     anagram_lookup = {} #For recovering actual words at the end if we want
 
@@ -92,16 +139,20 @@ def create_initial_wordtree(filename='words_alpha.txt'):
                     anagram_lookup[sorted_word_string] = []
                 anagram_lookup[sorted_word_string].append(word)
             
-                word_tree.add_word(sorted_word)
+                if as_list:
+                    structure.add_word(sorted_word)
+                else:
+                    structure.add_word(sorted_word_string)
                 
-    return word_tree, anagram_lookup
+    return anagram_lookup
 
 
-if __name__ == "__main__":
+def solve_with_word_tree():
             
     start_time = time.time()
     print("Creating word tree...")
-    word_tree, anagram_lookup = create_initial_wordtree()
+    word_tree = WordTree(5)
+    anagram_lookup = create_initial_word_structure(word_tree)
     print("There are", len(anagram_lookup), " words to work through")
     print("Word tree created")
 
@@ -111,3 +162,21 @@ if __name__ == "__main__":
     end_time = time.time()
     
     print("Completed in",end_time-start_time," seconds")
+    
+    return answer_list
+    
+def solve_with_word_table():
+    
+    start_time = time.time()
+    print("Creating word table...")
+    word_table = WordTable(5)
+    anagram_lookup = create_initial_word_structure(word_table, as_list=False)
+    print("There are", len(anagram_lookup), " words to work through")
+    print("Word table created")
+    
+    answer_list = word_table.solve(5)
+    end_time = time.time()
+    
+    print('Completed in ', end_time-start_time,' seconds')
+    
+    return answer_list
