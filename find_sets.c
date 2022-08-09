@@ -17,12 +17,13 @@ void add_word(struct WordTree *word_tree, char word[]) {
     strcpy((*word_tree).word, word);
   }
   else {
-    int index = (int)(word[layer + 1]) % 32;
+    int index = (int)(word[layer + 1]) % 32 - 1;
     if ((*word_tree).children[index] == NULL) {
         (*word_tree).children[index] = malloc(sizeof(struct WordTree));
         for (int i = 0;i < 26;i++) {
           (*((*word_tree).children[index])).children[i] = NULL;
         }
+        (*((*word_tree).children[index])).layer = (*word_tree).layer + 1;
     }
     add_word((*word_tree).children[index], word);
   }
@@ -57,12 +58,12 @@ void solve(struct WordTree word_tree, int iteration_number, char current_place[]
 
     int start_place = 0;
     if (order_constraint) {
-      start_place = (int)(current_place[word_tree.layer + 1]) % 32;
+      start_place = (int)(current_place[word_tree.layer + 1]) % 32 - 1;
     }
 
     int available[26] = {1};
     for (int i = 0;i < iteration_number*word_length;i++) {
-      available[(int) (used_letters[i]) % 32] = 0;
+      available[(int) (used_letters[i]) % 32 - 1] = 0;
     }
     for (int i = start_place;i < 26;i++) {
       if (available[i]) {
@@ -144,15 +145,13 @@ int main() {
           }
         }
         if (no_repeats == 1) {
-          printf("%s", sorted_word);
-          printf("\n");
           add_word(&word_tree, sorted_word);
-          printf("Word added\n");
         }
       }
     }
   }
 
+  printf("Tree built.\n");
   printf("Allocating answer store memory...\n");
   char answer_store[250000]; //Space for up to 10,000 solutions if needed
   int answer_store_index = 0;
