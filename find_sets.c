@@ -29,7 +29,7 @@ void add_word(struct WordTree *word_tree, char word[]) {
   }
 }
 
-void solve(struct WordTree word_tree, int iteration_number, char current_place[], char used_letters[],
+void solve(struct WordTree *word_tree, int iteration_number, char current_place[], char used_letters[],
            char answer_store[], int *answer_store_index, struct WordTree *top_parent, int order_constraint) {
 
 
@@ -40,29 +40,29 @@ void solve(struct WordTree word_tree, int iteration_number, char current_place[]
   }
   */
 
-  if (word_tree.layer == word_length - 1) {
+  if ((*word_tree).layer == word_length - 1) {
     if (iteration_number == word_number - 1) {
       for (int i = 0;i < word_length * (word_number-1);i++) {
         answer_store[*answer_store_index] = used_letters[i];
         (*answer_store_index) += 1;
       }
       for (int i = 0;i < word_length;i++) {
-        answer_store[*answer_store_index] = word_tree.word[i];
+        answer_store[*answer_store_index] = (*word_tree).word[i];
         (*answer_store_index) += 1;
       }
     }
     else {
       for (int i = 0;i < word_length;i++) {
-        used_letters[iteration_number*word_length + i] = word_tree.word[i];
+        used_letters[iteration_number*word_length + i] = (*word_tree).word[i];
       }
-      solve(*top_parent, iteration_number+1, word_tree.word, used_letters, answer_store, answer_store_index, top_parent, 1);
+      solve(top_parent, iteration_number+1, (*word_tree).word, used_letters, answer_store, answer_store_index, top_parent, 1);
     }
   }
   else {
 
     int start_place = 0;
     if (order_constraint) {
-      start_place = (int)(current_place[word_tree.layer + 1]) % 32 - 1;
+      start_place = (int)(current_place[(*word_tree).layer + 1]) % 32 - 1;
     }
 
     int available[26];
@@ -74,8 +74,8 @@ void solve(struct WordTree word_tree, int iteration_number, char current_place[]
     }
     for (int i = start_place;i < 26;i++) {
       if (available[i]) {
-        if (word_tree.children[i] != NULL) {
-            solve(*(word_tree.children[i]), iteration_number, current_place, used_letters, answer_store, answer_store_index, top_parent,
+        if ((*word_tree).children[i] != NULL) {
+            solve((*word_tree).children[i], iteration_number, current_place, used_letters, answer_store, answer_store_index, top_parent,
                   order_constraint && (i == start_place));
         }
       }
@@ -166,7 +166,7 @@ int main() {
   int answer_store_index = 0;
   char used_letters[25];
   printf("Solving tree...\n");
-  solve(word_tree, 0, "aaaaa", used_letters, answer_store, &answer_store_index, &word_tree, 0);
+  solve(&word_tree, 0, "aaaaa", used_letters, answer_store, &answer_store_index, &word_tree, 0);
 
   printf("Number of sets found: %d", answer_store_index / 25);
 
