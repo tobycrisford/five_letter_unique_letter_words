@@ -6,7 +6,7 @@ This problem is taken from [Matt Parker's video](https://www.youtube.com/watch?v
 
 I was interested in how I would have approached the problem. I don't think I would have created the graph theory solution, but I wondered if I could still make a significant improvement on 31 days. In my approach, we still do a search through all of the possible combinations, but we store the words in a data structure that allows us to efficiently rule out words that have no chance of working, without needing to check every single one. The tree data structure I've used is taken from my solution to the [Countdown Letters round](https://github.com/tobycrisford/countdown) (from 15 years ago).
 
-On my ordinary laptop, my python script finishes in 22-26 minutes.
+**On my ordinary laptop, my python script finishes in 22-26 minutes.**
 
 ## High level summary of the approach
 
@@ -17,3 +17,7 @@ You can think of this approach as a brute force search through the 5,977^5 possi
 - The words are stored in a tree structure, in which each node has 26 branches, one for each letter. For example, 'paint' would be located at .->'p'->'a'->'i'->'n'->'t'. This means when we are searching through the possible arrangements, if we have already used the letter 'a', we simply never look down any of the 'a' branches of the tree any more when trying subsequent words. This is where the biggest speedup comes in.
 
 - For a final small speedup, during tree creation, we get each node to remember any letters which all the words that have been sent through it have in common. Then, during the search phase, if we've already used one of these letters, we can also skip that node, even if the letter it corresponds to hasn't yet been used.
+
+## C version
+
+I also implemented an essentially identical algorithm in C, out of curiosity (and as an excuse to learn some C!). **That completes in just over 5 minutes.**
