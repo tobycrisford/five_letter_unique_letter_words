@@ -73,7 +73,95 @@ void solve(struct WordTree word_tree, int iteration_number, char current_place[]
   }
 }
 
+void sort_word(char input_array[], char output_array[], int length) {
+  if (length == 1) {
+    output_array[0] = input_array[0];
+    return;
+  }
+  char small_half[length-1];
+  char big_half[length-1];
+  int small_counter = 0;
+  int big_counter = 0;
+  for (int i = 1;i < length;i++) {
+    if (input_array[i] < input_array[0]) {
+      small_half[small_counter] = input_array[i];
+      small_counter++;
+    }
+    else {
+      big_half[big_counter] = input_array[i];
+      big_counter++;
+    }
+  }
+  char sorted_small[small_counter+1];
+  char sorted_big[big_counter+1];
+  if (small_counter > 0) {
+    sort_word(small_half, sorted_small, small_counter);
+  }
+  if (big_counter > 0) {
+    sort_word(big_half, sorted_big, big_counter);
+  }
+  for (int i = 0;i < small_counter;i++) {
+    output_array[i] = sorted_small[i];
+  }
+  output_array[small_counter] = input_array[0];
+  for (int i = 0;i < big_counter;i++) {
+    output_array[small_counter + 1 + i] = sorted_big[i];
+  }
+}
+
+
 int main() {
-  printf("Hello World!");
+
+  printf("Building word tree...\n");
+  FILE *file_pointer;
+  char buff[100];
+  struct WordTree word_tree;
+  word_tree.layer = -1;
+  for (int i = 0;i < 26;i++) {
+    word_tree.children[i] = NULL;
+  }
+  printf("Parent node initialized\n");
+  file_pointer = fopen("words_alpha.txt","r");
+  printf("File opened\n");
+  char sorted_word[word_length];
+  int no_repeats;
+  if (file_pointer == NULL) {
+    printf("Error opening file");
+    return -1;
+  }
+  else {
+    while (1==1) {
+      if (fgets(buff, 100, file_pointer) == NULL) {
+        break;
+      }
+      if (strlen(buff) == word_length+1) {
+        sort_word(buff, sorted_word, word_length);
+        no_repeats = 1;
+        for (int i = 1;i < word_length;i++) {
+          if (sorted_word[i-1] == sorted_word[i]) {
+            no_repeats = 0;
+            break;
+          }
+        }
+        if (no_repeats == 1) {
+          printf("%s", sorted_word);
+          printf("\n");
+          add_word(&word_tree, sorted_word);
+          printf("Word added\n");
+        }
+      }
+    }
+  }
+
+  printf("Allocating answer store memory...\n");
+  char answer_store[250000]; //Space for up to 10,000 solutions if needed
+  int answer_store_index = 0;
+  char used_letters[25];
+  printf("Solving tree...\n");
+  solve(word_tree, 0, "aaaaa", used_letters, answer_store, &answer_store_index, &word_tree, 0);
+
+  printf("Number of sets found: %d", answer_store_index);
+
   return 0;
 }
+
