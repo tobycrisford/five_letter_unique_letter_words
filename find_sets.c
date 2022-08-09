@@ -23,7 +23,7 @@ void add_word(struct WordTree *word_tree, char word[]) {
         for (int i = 0;i < 26;i++) {
           (*((*word_tree).children[index])).children[i] = NULL;
         }
-        (*((*word_tree).children[index])).layer = (*word_tree).layer + 1;
+        (*((*word_tree).children[index])).layer = layer + 1;
     }
     add_word((*word_tree).children[index], word);
   }
@@ -32,11 +32,13 @@ void add_word(struct WordTree *word_tree, char word[]) {
 void solve(struct WordTree word_tree, int iteration_number, char current_place[], char used_letters[],
            char answer_store[], int *answer_store_index, struct WordTree *top_parent, int order_constraint) {
 
-  printf("Function called!\n");
 
+  /*
   if (iteration_number == 1 && word_tree.layer == -1) {
-    printf(current_place);
+    printf("%s\n", current_place);
+
   }
+  */
 
   if (word_tree.layer == word_length - 1) {
     if (iteration_number == word_number - 1) {
@@ -58,20 +60,18 @@ void solve(struct WordTree word_tree, int iteration_number, char current_place[]
   }
   else {
 
-    printf("Here!");
-    printf("%d", order_constraint);
-
     int start_place = 0;
     if (order_constraint) {
       start_place = (int)(current_place[word_tree.layer + 1]) % 32 - 1;
     }
 
-    int available[26] = {1};
-    printf("Here2!");
+    int available[26];
+    for (int i = 0;i < 26;i++) {
+      available[i] = 1;
+    }
     for (int i = 0;i < iteration_number*word_length;i++) {
       available[(int) (used_letters[i]) % 32 - 1] = 0;
     }
-    printf("Here3!");
     for (int i = start_place;i < 26;i++) {
       if (available[i]) {
         if (word_tree.children[i] != NULL) {
@@ -168,7 +168,7 @@ int main() {
   printf("Solving tree...\n");
   solve(word_tree, 0, "aaaaa", used_letters, answer_store, &answer_store_index, &word_tree, 0);
 
-  printf("Number of sets found: %d", answer_store_index);
+  printf("Number of sets found: %d", answer_store_index / 25);
 
   return 0;
 }
