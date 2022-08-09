@@ -9,6 +9,7 @@ struct WordTree {
   int layer;
   struct WordTree* children[26];
   char word[word_length];
+  int all_words_contain[26];
 };
 
 void add_word(struct WordTree *word_tree, char word[]) {
@@ -22,10 +23,21 @@ void add_word(struct WordTree *word_tree, char word[]) {
         (*word_tree).children[index] = malloc(sizeof(struct WordTree));
         for (int i = 0;i < 26;i++) {
           (*((*word_tree).children[index])).children[i] = NULL;
+          (*((*word_tree).children[index])).all_words_contain[i] = 1;
         }
         (*((*word_tree).children[index])).layer = layer + 1;
     }
     add_word((*word_tree).children[index], word);
+    int working_containment_check[26];
+    for (int i = 0;i < 26;i++) {
+      working_containment_check[i] = 0;
+    }
+    for (int i = layer + 1;i < word_length;i++) {
+      working_containment_check[(int) (word[i]) % 32 - 1] = 1;
+    }
+    for (int i = 0;i < 26;i++) {
+      (*word_tree).all_words_contain[i] = (*word_tree).all_words_contain[i] && working_containment_check[i];
+    }
   }
 }
 
@@ -72,11 +84,23 @@ void solve(struct WordTree *word_tree, int iteration_number, char current_place[
     for (int i = 0;i < iteration_number*word_length;i++) {
       available[(int) (used_letters[i]) % 32 - 1] = 0;
     }
+    int useable;
     for (int i = start_place;i < 26;i++) {
       if (available[i]) {
         if ((*word_tree).children[i] != NULL) {
-            solve((*word_tree).children[i], iteration_number, current_place, used_letters, answer_store, answer_store_index, top_parent,
-                  order_constraint && (i == start_place));
+            useable = 1;
+            if ((*word_tree).layer < word_length - 2) {
+                for (int j = 0;j < iteration_number*word_length;j++) {
+                  if ((*((*word_tree).children[i])).all_words_contain[(int) (used_letters[j]) % 32 - 1]) {
+                    useable = 0;
+                    break;
+                  }
+                }
+            }
+            if (useable) {
+                solve((*word_tree).children[i], iteration_number, current_place, used_letters, answer_store, answer_store_index, top_parent,
+                      order_constraint && (i == start_place));
+            }
         }
       }
     }
