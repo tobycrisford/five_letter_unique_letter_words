@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define letter_total 26;
+#define letter_total 26
 
 struct WordTree {
   int layer;
@@ -60,11 +60,6 @@ void solve(struct WordTree *word_tree, int letter_number, char current_place[], 
 
   
   int layer = (*word_tree).layer;
-  
-  if (letter_number > 0 && layer == -1) {
-    printf("%s\n", current_place);
-
-  }
   
 
   if (letter_number + 1 == letter_total) {
@@ -179,6 +174,7 @@ int main() {
     char sorted_word[100];
     int no_repeats;
     int word_counter = 0;
+    int word_length;
     if (file_pointer == NULL) {
         printf("Error opening file");
         return -1;
@@ -197,7 +193,7 @@ int main() {
             }
         }
         if (no_repeats == 1) {
-            add_word(&word_tree, sorted_word);
+            add_word(&word_tree, sorted_word, word_length);
             word_counter++;
         }
     }
@@ -207,6 +203,7 @@ int main() {
     char *answer_store = malloc(27000000 * sizeof(char)); //Space for up to a million solutions if needed
     int answer_store_index = 0;
     char used_letters[letter_total];
+    scanf("Pause...");
     printf("Solving tree...\n");
     solve(&word_tree, -1, "", 0, used_letters, answer_store, &answer_store_index, &word_tree, 0);
 
