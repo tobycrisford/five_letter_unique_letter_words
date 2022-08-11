@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define letter_total 26
+#define min_word_length 5
 
 struct WordTree {
   int layer;
@@ -62,7 +63,7 @@ void solve(struct WordTree *word_tree, int letter_number, int space_number, char
   int layer = (*word_tree).layer;
   
   
-  if (space_number == 2 && layer == -1) {
+  if (space_number == 1 && layer == -1) {
     char print_output[current_place_length + 1];
     memcpy(print_output, current_place, current_place_length);
     print_output[current_place_length] = '\0';
@@ -95,7 +96,7 @@ void solve(struct WordTree *word_tree, int letter_number, int space_number, char
 
   else {
 
-    if ((*word_tree).contains_word) {
+    if ((*word_tree).contains_word && layer + 1 >= min_word_length) {
         char new_current_place[layer + 1];
         for (int i = 0;i < layer + 1;i++) {
             new_current_place[i] = used_letters[((letter_number + space_number) - layer) + i];
