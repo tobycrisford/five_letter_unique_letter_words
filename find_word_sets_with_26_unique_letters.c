@@ -217,7 +217,10 @@ int main() {
     printf("Solving tree...\n");
     solve(&word_tree, -1, 0, "", 0, used_letters, answer_store, &answer_store_index, &word_tree, 0);
 
-    printf("Number of sets found: %d", answer_store_index / 25);
+    char output[answer_store_index];
+    memcpy(output, answer_store, answer_store_index);
+    printf("%s\n", output);
+    
 
     return 0;
 }
