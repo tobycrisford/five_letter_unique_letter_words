@@ -66,6 +66,7 @@ void solve(struct WordTree *word_tree, int letter_number, int space_number, char
     char print_output[current_place_length + 1];
     memcpy(print_output, current_place, current_place_length);
     print_output[current_place_length] = '\0';
+    printf("%d  ", *answer_store_index);
     printf("%s\n", print_output);
   }
 
@@ -78,14 +79,17 @@ void solve(struct WordTree *word_tree, int letter_number, int space_number, char
         answer_store[*answer_store_index] = ' ';
         answer_store[*answer_store_index + 1] = ' ';
         (*answer_store_index) += 2;
+        
         /*
         char output[letter_number + space_number + 1];
         memcpy(output, used_letters, letter_number + space_number + 1);
-        output[letter_number + space_number + 1] = '\0';
+        output[letter_number + space_number] = '\0';
         printf("%d ", letter_number + space_number + 1);
         printf("Solution found: %s\n", output);
-        scanf("%5s", junk);
+        //scanf("%5s", junk);
         */
+        
+        
     }
   }
 
@@ -94,17 +98,19 @@ void solve(struct WordTree *word_tree, int letter_number, int space_number, char
     if ((*word_tree).contains_word) {
         char new_current_place[layer + 1];
         for (int i = 0;i < layer + 1;i++) {
-            new_current_place[i] = used_letters[(letter_number + space_number - layer) + i];
+            new_current_place[i] = used_letters[((letter_number + space_number) - layer) + i];
             used_letters[letter_number + space_number + 1] = ' ';
         }
+        
         /*
         char output[letter_number + space_number + 1];
         memcpy(output, used_letters, letter_number + space_number + 1);
-        output[letter_number + space_number + 1] = '\0';
+        output[letter_number + space_number] = '\0';
         printf("%d ", letter_number + space_number + 1);
         printf(" Adding new word from here: %s\n", output);
-        scanf("%5s", junk);
+        //scanf("%5s", junk);
         */
+
         solve(top_parent, letter_number, space_number + 1, new_current_place, layer + 1, used_letters, answer_store, answer_store_index, top_parent, 1);
     }
 
@@ -139,14 +145,16 @@ void solve(struct WordTree *word_tree, int letter_number, int space_number, char
             }
             if (useable) {
                 used_letters[letter_number + space_number + 1] = number_to_char(i);
+                
                 /*
                 char output[letter_number + space_number + 1];
                 memcpy(output, used_letters, letter_number + space_number + 1);
-                output[letter_number + space_number + 1] = '\0';
+                output[letter_number + space_number] = '\0';
                 printf("%d ", letter_number + space_number + 1);
                 printf("Adding new letter from here: %s\n", output);
-                scanf("%5s", junk);
+                //scanf("%5s", junk);
                 */
+                
                 solve((*word_tree).children[i], letter_number + 1, space_number, current_place, current_place_length, used_letters, answer_store, answer_store_index, top_parent,
                       order_constraint && (i == start_place));
             }
@@ -235,8 +243,16 @@ int main() {
     }
 
     printf("Tree built with %d words.\n", word_counter);
+
+    //Removing the one letter words except from 'i' and 'a' - word list includes all of them by default
+    for (int i = 0;i < 26;i++) {
+        if (i != 8 && i != 0) {
+            (*(word_tree.children[i])).contains_word = 0;
+        }
+    }
+
     printf("Allocating answer store memory...\n");
-    char *answer_store = malloc(27000000 * sizeof(char)); //Space for up to a million solutions if needed (slightly less now spaces added)
+    char *answer_store = malloc(5000000000 * sizeof(char)); //Space for lots of solutions
     int answer_store_index = 0;
     char used_letters[2 * letter_total];
     printf("Solving tree...\n");
