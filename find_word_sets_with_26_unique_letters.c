@@ -28,7 +28,7 @@ void update_containment_info(struct WordTree *word_tree, char new_word[], int ne
     for (int i = 0;i < new_word_length;i++) {
       working_containment_check[char_to_number(new_word[i])] = 1;
     }
-    for (int i = 0;i < 26;i++) {
+    for (int i = (*word_tree).layer;i < 26;i++) {
       (*word_tree).all_words_contain[i] = (*word_tree).all_words_contain[i] && working_containment_check[i];
     }
 }
