@@ -34,7 +34,11 @@ for f in os.listdir('../../wordle_solver/word_frequencies'):
         new_common_words = [word for word in frequency_dict if frequency_dict[word] > frequency_threshold]
         common_word_list += new_common_words
 
+print("Found ", len(common_word_list), " common words.")
 
 with open('common_words.txt','w') as f:
     for word in common_word_list:
-        f.write(word + "\n")
+        try:
+            f.write(word + "\n")
+        except:
+            print("Failed on ", word)
